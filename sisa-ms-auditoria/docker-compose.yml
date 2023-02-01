@@ -1,0 +1,23 @@
+version: '3'
+services:
+  mongo:
+    container_name: ms-auditoria-mongo
+    image: mongo:4.0
+    ports:
+      - 27073:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    volumes:
+      - mongo:/data/mongo
+    networks:
+      - mongo
+
+networks:
+  mongo:
+    driver: bridge
+
+volumes:
+  mongo:
