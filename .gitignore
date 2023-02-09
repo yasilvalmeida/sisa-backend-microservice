@@ -1,3 +1,42 @@
-sisa-backend-microservice.git
-node_modules/
+#Api Gateway
 sisa-api-gateway/dist/
+
+#MS Ajuda
+sisa-ms-ajuda/node_modules/
+sisa-ms-ajuda/dist/
+sisa-ms-ajuda/.env
+
+#MS Analytics
+sisa-ms-analytics/node_modules/
+sisa-ms-analytics/dist/
+sisa-ms-analytics/.env
+
+#MS Auditoria
+sisa-ms-auditoria/node_modules/
+sisa-ms-auditoria/dist/
+sisa-ms-auditoria/.env
+
+#MS Auth
+sisa-ms-auth/node_modules/
+sisa-ms-auth/dist/
+sisa-ms-auth/.env
+
+#MS Notificacao
+sisa-ms-notificacao/node_modules/
+sisa-ms-notificacao/dist/
+sisa-ms-notificacao/.env
+
+#MS Parceiro
+sisa-ms-parceiro/node_modules/
+sisa-ms-parceiro/dist/
+sisa-ms-parceiro/.env
+
+#MS Projeto
+sisa-ms-projeto/node_modules/
+sisa-ms-projeto/dist/
+sisa-ms-projeto/.env
+
+#MS Utilizador
+sisa-ms-utilizador/node_modules/
+sisa-ms-utilizador/dist/
+sisa-ms-utilizador/.env

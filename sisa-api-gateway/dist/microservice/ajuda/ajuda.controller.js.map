@@ -1,1 +1,0 @@
-{"version":3,"file":"ajuda.controller.js","sourceRoot":"","sources":["../../../src/microservice/ajuda/ajuda.controller.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,2CASwB;AAIxB,mDAA+C;AAGxC,IAAM,eAAe,GAArB,MAAM,eAAe;IAC1B,YAAoB,OAAqB;QAArB,YAAO,GAAP,OAAO,CAAc;IAAG,CAAC;CAoC9C,CAAA;AArCY,eAAe;IAD3B,IAAA,mBAAU,EAAC,OAAO,CAAC;qCAEW,4BAAY;GAD9B,eAAe,CAqC3B;AArCY,0CAAe"}
