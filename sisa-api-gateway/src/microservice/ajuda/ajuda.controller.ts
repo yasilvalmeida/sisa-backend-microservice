@@ -10,14 +10,13 @@ import {
 } from '@nestjs/common';
 import { ApiBody } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
-import { AjudaDto } from 'src/model/dto/ajuda.dto';
-import { Ajuda } from 'src/model/interface/ajuda.interface';
+import { Ajuda } from 'src/common/model/interface/ajuda.interface';
 import { AjudaService } from './ajuda.service';
 
 @Controller('ajuda')
 export class AjudaController {
   constructor(private service: AjudaService) {}
-  @Get()
+  /* @Get()
   findAllAjuda(): Observable<Ajuda[]> {
     return this.service.findAllAjuda();
   }
@@ -51,6 +50,5 @@ export class AjudaController {
 
   @Patch(':id/activate')
   activate(@Param('id') id: number) {
-    /* return this.client.emit('activate-user', { id }); */
-  }
+  } */
 }

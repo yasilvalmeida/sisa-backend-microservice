@@ -7,11 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Utilizador {
-  id        BigInt  @default(autoincrement()) @id
-  nome      String  
-  email     String  @unique
-  bloqueado Boolean @default(false) 
-  acesso    Int     
-  password  String   
+enum TipoToken {
+  Activacao
+  Recuperacao
+}
+
+enum TipoLogin {
+  Sucesso
+  Falhado
+}
+
+model Token {
+  id        BigInt    @id @default(autoincrement())
+  email     String    @unique
+  validade  DateTime
+  tipo      TipoToken
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Login {
+  id        BigInt    @id @default(autoincrement())
+  email     String    @unique
+  tentativa Int       @default(0)
+  tipo      TipoLogin
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

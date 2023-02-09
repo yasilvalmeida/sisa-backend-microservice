@@ -1,8 +1,7 @@
 import { ClientKafka } from '@nestjs/microservices';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Ajuda } from 'src/model/interface/ajuda.interface';
-import { AjudaDto } from 'src/model/dto/ajuda.dto';
+import { Ajuda } from 'src/common/model/interface/ajuda.interface';
 
 @Injectable()
 export class AjudaService implements OnModuleInit {
@@ -31,11 +30,11 @@ export class AjudaService implements OnModuleInit {
     return this.client.send('find-ajuda', { id });
   }
 
-  create(ajuda: AjudaDto): Observable<Ajuda> {
+  create(ajuda: any): Observable<Ajuda> {
     return this.client.send('create-ajuda', ajuda);
   }
 
-  update(id: number, { title }: AjudaDto) {
+  update(id: number, { title }: any) {
     const payload = {
       id,
       title,

@@ -14,11 +14,18 @@ const parceiro_module_1 = require("./microservice/parceiro/parceiro.module");
 const auth_module_1 = require("./microservice/auth/auth.module");
 const ajuda_module_1 = require("./microservice/ajuda/ajuda.module");
 const notificacao_module_1 = require("./microservice/notificacao/notificacao.module");
+const utilizador_module_1 = require("./microservice/utilizador/utilizador.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [parceiro_module_1.ParceiroModule, auth_module_1.AuthModule, ajuda_module_1.AjudaModule, notificacao_module_1.NotificacaoModule],
+        imports: [
+            parceiro_module_1.ParceiroModule,
+            auth_module_1.AuthModule,
+            ajuda_module_1.AjudaModule,
+            notificacao_module_1.NotificacaoModule,
+            utilizador_module_1.UtilizadorModule,
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
