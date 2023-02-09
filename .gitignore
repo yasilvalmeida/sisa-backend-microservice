@@ -1,1 +1,3 @@
-sisa-backend-microservice.git/
+sisa-backend-microservice.git
+node_modules
+dist
