@@ -1,26 +1,14 @@
-import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
-import { ClientKafka, EventPattern } from '@nestjs/microservices';
+import { Controller, Req } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import { IRequestActivationToken } from './interface/mail.interface';
 
 @Controller()
-export class AppController implements OnModuleInit {
-  constructor(
-    private readonly appService: AppService,
-    @Inject('AUTH_SERVICE') private readonly authClient: ClientKafka,
-  ) {}
+export class AppController {
+  constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @EventPattern('check_health')
-  handleOrderCreated(data: any) {
-    console.log('ms-ajuda-reached', data);
-    return this.appService.handleCheckHealth(data);
-  }
-
-  onModuleInit() {
-    this.authClient.subscribeToResponseOf('get_user');
+  @MessagePattern('send-activation-token')
+  async sendActivationToken(@Payload() data: IRequestActivationToken) {
+    return this.appService.sendActivationToken(data);
   }
 }

@@ -11,10 +11,11 @@ datasource db {
 }
 
 enum Acesso {
-  Administrador          @map("Administrador")
-  Validador              @map("Validador")
-  Parceiro               @map("Parceiro")
-  UnidadeExecucaoProjeto @map("UnidadeExecucaoProjeto")
+  Administrador
+  Validador
+  Parceiro
+  UnidadeExecucaoProjeto
+  Convidado
 }
 
 model Utilizador {
@@ -24,7 +25,7 @@ model Utilizador {
   email     String   @unique
   bloqueado Boolean? @default(false)
   eliminado Boolean? @default(false)
-  acesso    Acesso
+  acesso    Acesso?  @default(Convidado)
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

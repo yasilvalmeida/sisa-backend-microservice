@@ -1,19 +1,22 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ParceiroModule } from './microservice/parceiro/parceiro.module';
-import { AuthModule } from './microservice/auth/auth.module';
-import { AjudaModule } from './microservice/ajuda/ajuda.module';
-import { NotificacaoModule } from './microservice/notificacao/notificacao.module';
-import { UtilizadorModule } from './microservice/utilizador/utilizador.module';
+import { ConfigModule } from '@nestjs/config';
+import { validate } from './common/validation/env.validation';
+import { MsAuthModule } from './microservice/ms-auth/ms-auth.module';
+import { MsUtilizadorModule } from './microservice/ms-utilizador/ms-utilizador.module';
+import { MsNotificacaoModule } from './microservice/ms-notificacao/ms-notificacao.module';
 
 @Module({
   imports: [
-    ParceiroModule,
-    AuthModule,
-    AjudaModule,
-    NotificacaoModule,
-    UtilizadorModule,
+    ConfigModule.forRoot({
+      validate,
+      envFilePath: ['.env'],
+      isGlobal: true,
+    }),
+    MsAuthModule,
+    MsUtilizadorModule,
+    MsNotificacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

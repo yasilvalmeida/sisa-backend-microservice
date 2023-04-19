@@ -1,6 +1,7 @@
 #Api Gateway
 sisa-api-gateway/dist/
 sisa-api-gateway/node_modules/
+sisa-api-gateway/.env
 
 #MS Ajuda
 sisa-ms-ajuda/node_modules/

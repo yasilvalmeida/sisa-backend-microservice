@@ -1,24 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './database/prisma.service';
 import {
+  ICreateUtilizador,
+  IError,
   IListaUtilizador,
+  ILoginUtilizador,
+  IUpdateUtilizador,
   IUtilizador,
-} from './model/interface/utilizador.interface';
+} from './interface/utilizador.interface';
 import * as bcrypt from 'bcrypt';
-import { Utilizador } from '@prisma/client';
+import { Acesso, Utilizador } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  async findAll(limit: number, offset: number): Promise<IListaUtilizador> {
+  async findAll(
+    limit: number,
+    offset: number,
+    sortBy: string,
+    sortDirection: string,
+  ): Promise<IListaUtilizador> {
     const result = await this.prismaService.utilizador.findMany({
-      where: {
-        bloqueado: false,
-        eliminado: false,
-      },
       skip: offset ? offset - 1 : 0,
       take: limit ? limit : 10,
+      orderBy: [
+        {
+          [sortBy]: sortDirection,
+        },
+      ],
     });
     const transformed: IUtilizador[] = result?.map((utilizador: Utilizador) => {
       return {
@@ -35,11 +49,9 @@ export class AppService {
     return { total: transformed?.length, limit, offset, results: transformed };
   }
 
-  async find(id: number): Promise<IUtilizador> {
+  async findById(id: number): Promise<IUtilizador> {
     const utilizador = await this.prismaService.utilizador.findFirst({
       where: {
-        bloqueado: false,
-        eliminado: false,
         id: {
           equals: parseInt(`${id}`),
         },
@@ -57,44 +69,83 @@ export class AppService {
     };
   }
 
-  async create(utilizador: IUtilizador): Promise<IUtilizador> {
-    const { password } = utilizador;
-    const saltOrRounds = 10;
-    const hash = await bcrypt.hash(password, saltOrRounds);
-    const result = await this.prismaService.utilizador.create({
-      data: {
-        ...utilizador,
-        password: hash,
+  async findByEmail(email: string): Promise<IUtilizador> {
+    const utilizador = await this.prismaService.utilizador.findFirst({
+      where: {
+        email,
       },
     });
-    return result as IUtilizador;
+    return {
+      id: utilizador?.id,
+      nome: utilizador?.nome,
+      apelido: utilizador?.apelido,
+      email: utilizador?.email,
+      password: utilizador?.password,
+      bloqueado: utilizador?.bloqueado,
+      acesso: utilizador?.acesso,
+      createdAt: utilizador?.createdAt,
+      updatedAt: utilizador?.updatedAt,
+    };
   }
 
-  async update(id: number, utilizador: IUtilizador): Promise<IUtilizador> {
+  async create(utilizador: ICreateUtilizador): Promise<IUtilizador | IError> {
     try {
-      const { nome, apelido, email, password, acesso } = utilizador;
+      const { email, password } = utilizador;
       const saltOrRounds = 10;
-      const hash = await bcrypt.hash(password, saltOrRounds);
+      const key = this.configService.get('PASSWORD_SALT_KEY');
+      const salt = await bcrypt.genSalt(saltOrRounds);
+      const combinedPassword = password + '.' + key;
+      const hash = await bcrypt.hash(combinedPassword, salt);
+      const foundUser = await this.findByEmail(email);
+      if (foundUser?.id) {
+        return { payload: utilizador?.email, message: 'Email duplicado' };
+      }
+      const result = await this.prismaService.utilizador.create({
+        data: {
+          ...utilizador,
+          password: hash,
+        },
+      });
+      return result as IUtilizador;
+    } catch (error) {
+      console.log('error', error);
+      return { payload: utilizador?.email, message: 'Email duplicado' };
+    }
+  }
+
+  async update(
+    id: number,
+    utilizador: IUpdateUtilizador,
+  ): Promise<IUtilizador> {
+    const { nome, apelido } = utilizador;
+    const findUtilizador = await this.findById(id);
+    if (
+      findUtilizador?.id &&
+      !findUtilizador?.bloqueado &&
+      !findUtilizador?.eliminado
+    ) {
       const result = await this.prismaService.utilizador.update({
         data: {
           nome,
           apelido,
-          email,
-          password: hash,
-          acesso,
         },
         where: {
           id: parseInt(`${id}`),
         },
       });
       return result as IUtilizador;
-    } catch (error) {
-      throw error;
+    } else {
+      return {};
     }
   }
 
   async remove(id: number): Promise<IUtilizador> {
-    try {
+    const findUtilizador = await this.findById(id);
+    if (
+      findUtilizador?.id &&
+      !findUtilizador?.bloqueado &&
+      !findUtilizador?.eliminado
+    ) {
       const result = await this.prismaService.utilizador.update({
         data: {
           eliminado: true,
@@ -104,40 +155,78 @@ export class AppService {
         },
       });
       return result as IUtilizador;
-    } catch (error) {
-      throw error;
+    } else {
+      return {};
     }
   }
 
-  async block(id: number): Promise<IUtilizador> {
-    try {
+  async toggleBlock(id: number): Promise<IUtilizador> {
+    const findUtilizador = await this.findById(id);
+    if (findUtilizador?.id && !findUtilizador?.eliminado) {
       const result = await this.prismaService.utilizador.update({
         data: {
-          bloqueado: true,
+          bloqueado: !findUtilizador?.bloqueado,
         },
         where: {
           id: parseInt(`${id}`),
         },
       });
       return result as IUtilizador;
-    } catch (error) {
-      throw error;
+    } else {
+      return {};
     }
   }
 
-  async unblock(id: number): Promise<IUtilizador> {
-    try {
+  async acesso(id: number, acesso: Acesso): Promise<IUtilizador> {
+    const findUtilizador = await this.findById(id);
+    if (
+      findUtilizador?.id &&
+      !findUtilizador?.bloqueado &&
+      !findUtilizador?.eliminado
+    ) {
       const result = await this.prismaService.utilizador.update({
-        data: {
-          bloqueado: false,
-        },
+        data: { acesso },
         where: {
           id: parseInt(`${id}`),
         },
       });
       return result as IUtilizador;
-    } catch (error) {
-      throw error;
+    } else {
+      return {};
     }
+  }
+
+  async login(login: ILoginUtilizador): Promise<IUtilizador | IError> {
+    const { email, password } = login;
+    const findUtilizador = await this.findByEmail(email);
+    if (
+      findUtilizador?.id &&
+      !findUtilizador?.bloqueado &&
+      !findUtilizador?.eliminado
+    ) {
+      const validPassword = await bcrypt.compare(
+        password,
+        findUtilizador?.password,
+      );
+      if (!validPassword)
+        return { payload: { password }, message: 'Password not match' };
+      return {
+        id: findUtilizador?.id,
+        nome: findUtilizador?.nome,
+        apelido: findUtilizador?.apelido,
+        email: findUtilizador?.email,
+        acesso: findUtilizador?.acesso,
+      };
+    } else {
+      return {};
+    }
+  }
+
+  async recoverPassword(email: string): Promise<IUtilizador> {
+    const findUtilizador = await this.findByEmail(email);
+    if (findUtilizador?.id) {
+      return { email };
+    }
+    return findUtilizador;
   }
 }

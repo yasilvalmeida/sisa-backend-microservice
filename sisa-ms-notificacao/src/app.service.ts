@@ -1,22 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
-import { CheckHealthEvent } from './events/check-heath.event';
-import { GetUserRequest } from './models/get-user-request.dto';
+import { Injectable } from '@nestjs/common';
+import { IRequestActivationToken } from './interface/mail.interface';
+import { MailService } from './module/mail/mail.service';
 
 @Injectable()
 export class AppService {
-  constructor(
-    @Inject('AUTH_SERVICE') private readonly authClient: ClientKafka,
-  ) {}
-  getHello(): string {
-    return 'Hello World!';
-  }
+  constructor(private readonly mailService: MailService) {}
 
-  handleCheckHealth(checkHealthEvent: CheckHealthEvent) {
-    this.authClient
-      .send('get_user', new GetUserRequest(checkHealthEvent.userId))
-      .subscribe((user) => {
-        return `User ID ${user.id} ${user.name} checking Ajuda Service health`;
-      });
+  async sendActivationToken(data: IRequestActivationToken) {
+    console.log('ms-notification-service', data);
+    return this.mailService.sendActivationToken(data);
   }
 }

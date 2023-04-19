@@ -12,25 +12,19 @@ enum TipoToken {
   Recuperacao
 }
 
-enum TipoLogin {
-  Sucesso
-  Falhado
+enum EstadoToken {
+  PorValidar
+  Validado
+  Rejeitado
 }
 
 model Token {
-  id        BigInt    @id @default(autoincrement())
-  email     String    @unique
+  id        BigInt       @id @default(autoincrement())
+  email     String
   validade  DateTime
   tipo      TipoToken
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model Login {
-  id        BigInt    @id @default(autoincrement())
-  email     String    @unique
-  tentativa Int       @default(0)
-  tipo      TipoLogin
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  valor     String
+  estado    EstadoToken? @default(PorValidar)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
